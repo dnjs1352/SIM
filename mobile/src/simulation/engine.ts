@@ -153,7 +153,7 @@ export function runSimulation(params: SimulationParams): SimulationResult {
     const config = configs[index];
     return {
       id: config.id,
-      name: config.name,
+      name: config.name.trim(),
       meanProcessMinutes: config.meanProcessMinutes,
       processed: station.processed,
       utilization: Math.min(1, (station.busyMinutes + partialBusy) / shiftMinutes),

@@ -77,6 +77,11 @@ describe('runSimulation', () => {
     expect(result.stations[0].utilization).toBeCloseTo(1);
   });
 
+  it('reports trimmed station names', () => {
+    const result = runSimulation(deterministic({ stations: [{ id: 'a', name: '  용접 ', meanProcessMinutes: 1 }] }));
+    expect(result.stations[0].name).toBe('용접');
+  });
+
   it('rejects invalid parameters', () => {
     expect(() => runSimulation({ ...DEFAULT_PARAMS, stations: [] })).toThrow(InvalidParamsError);
     expect(() => runSimulation({ ...DEFAULT_PARAMS, productsPerShift: 1.5 })).toThrow(InvalidParamsError);

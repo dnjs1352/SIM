@@ -6,6 +6,7 @@ export type ParamsAction =
   | { readonly type: 'setVariability'; readonly value: number }
   | { readonly type: 'setSeed'; readonly value: number }
   | { readonly type: 'setStationTime'; readonly id: string; readonly value: number }
+  | { readonly type: 'renameStation'; readonly id: string; readonly name: string }
   | { readonly type: 'addStation' }
   | { readonly type: 'removeStation'; readonly id: string }
   | { readonly type: 'reset' };
@@ -33,6 +34,12 @@ export function paramsReducer(state: SimulationParams, action: ParamsAction): Si
         stations: state.stations.map((station) =>
           station.id === action.id ? { ...station, meanProcessMinutes: action.value } : station,
         ),
+      };
+    case 'renameStation':
+      // 입력 중인 원문을 그대로 저장한다. 빈 이름 등은 validateParams가 잡아 실행 버튼을 막는다.
+      return {
+        ...state,
+        stations: state.stations.map((station) => (station.id === action.id ? { ...station, name: action.name } : station)),
       };
     case 'addStation': {
       if (state.stations.length >= LIMITS.stations.max) return state;

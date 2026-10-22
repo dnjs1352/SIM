@@ -28,6 +28,13 @@ describe('paramsReducer', () => {
     expect(state.stations[0]).toBe(DEFAULT_PARAMS.stations[0]);
   });
 
+  it('renames only the targeted station', () => {
+    const state = paramsReducer(DEFAULT_PARAMS, { type: 'renameStation', id: 'station-3', name: '용접' });
+    expect(state.stations[2].name).toBe('용접');
+    expect(state.stations[2].meanProcessMinutes).toBe(DEFAULT_PARAMS.stations[2].meanProcessMinutes);
+    expect(state.stations[0]).toBe(DEFAULT_PARAMS.stations[0]);
+  });
+
   it('resets to defaults', () => {
     const changed = paramsReducer(DEFAULT_PARAMS, { type: 'setSeed', value: 1 });
     expect(paramsReducer(changed, { type: 'reset' })).toBe(DEFAULT_PARAMS);

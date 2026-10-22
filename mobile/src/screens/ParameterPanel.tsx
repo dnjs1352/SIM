@@ -6,6 +6,7 @@ import { SegmentedControl } from '../components/SegmentedControl';
 import { LIMITS, type SimulationParams, type ValidationErrors } from '../simulation';
 import type { ParamsAction } from '../state/paramsReducer';
 import { useTheme } from '../theme/useTheme';
+import { StationEditor } from './StationEditor';
 
 const VARIABILITY_OPTIONS = [
   { label: '없음', value: 0 },
@@ -76,6 +77,7 @@ export function ParameterPanel({ params, errors, dispatch }: ParameterPanelProps
               min={0}
               max={MAX_SEED}
               step={1}
+              showSteppers={false}
               error={errors.seed}
               onChange={(value) => dispatch({ type: 'setSeed', value })}
             />
@@ -90,38 +92,22 @@ export function ParameterPanel({ params, errors, dispatch }: ParameterPanelProps
 
       <Card
         title="공정 구성"
-        subtitle={`제품은 위에서 아래 순서로 ${params.stations.length}개 공정을 거칩니다.`}
+        subtitle={`제품은 위에서 아래 순서로 ${params.stations.length}개 공정을 거칩니다. 공정명을 눌러 바꿀 수 있습니다.`}
         accessory={
           <TextButton label="+ 추가" disabled={!canAdd} color={theme.accent} onPress={() => dispatch({ type: 'addStation' })} />
         }
       >
         {params.stations.map((station, index) => (
-          <View key={station.id} style={styles.stationRow}>
-            <View style={styles.stationField}>
-              <NumberField
-                label={`${index + 1}. ${station.name}`}
-                unit="분"
-                decimals={1}
-                value={station.meanProcessMinutes}
-                min={LIMITS.meanProcessMinutes.min}
-                max={LIMITS.meanProcessMinutes.max}
-                step={0.5}
-                error={errors.stationErrors?.[station.id]}
-                onChange={(value) => dispatch({ type: 'setStationTime', id: station.id, value })}
-              />
-            </View>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={`${station.name} 공정 삭제`}
-              accessibilityState={{ disabled: !canRemove }}
-              disabled={!canRemove}
-              hitSlop={8}
-              onPress={() => dispatch({ type: 'removeStation', id: station.id })}
-              style={({ pressed }) => [styles.remove, { opacity: !canRemove ? 0.3 : pressed ? 0.5 : 1 }]}
-            >
-              <Text style={[styles.removeText, { color: theme.danger }]}>✕</Text>
-            </Pressable>
-          </View>
+          <StationEditor
+            key={station.id}
+            station={station}
+            index={index}
+            errors={errors.stationErrors?.[station.id]}
+            canRemove={canRemove}
+            onRename={(name) => dispatch({ type: 'renameStation', id: station.id, name })}
+            onChangeTime={(value) => dispatch({ type: 'setStationTime', id: station.id, value })}
+            onRemove={() => dispatch({ type: 'removeStation', id: station.id })}
+          />
         ))}
         {errors.stations ? <Text style={{ color: theme.danger }}>{errors.stations}</Text> : null}
       </Card>
@@ -156,9 +142,5 @@ const styles = StyleSheet.create({
   fieldLabel: { fontSize: 15 },
   seedRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   seedField: { flex: 1 },
-  stationRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  stationField: { flex: 1 },
-  remove: { width: 28, alignItems: 'center' },
-  removeText: { fontSize: 16, fontWeight: '600' },
   textButton: { fontSize: 15, fontWeight: '600' },
 });

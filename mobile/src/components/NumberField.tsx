@@ -4,6 +4,8 @@ import { useTheme } from '../theme/useTheme';
 
 interface NumberFieldProps {
   readonly label: string;
+  /** 스크린 리더용 라벨. 화면 라벨만으로 대상이 모호할 때(예: 공정별 가공 시간) 지정한다. */
+  readonly accessibilityLabel?: string;
   readonly value: number;
   readonly onChange: (value: number) => void;
   readonly min: number;
@@ -13,6 +15,8 @@ interface NumberFieldProps {
   readonly decimals?: number;
   readonly unit?: string;
   readonly error?: string;
+  /** −/+ 버튼 표시 여부. 1씩 올리고 내릴 의미가 없는 값(시드 등)은 숨긴다. */
+  readonly showSteppers?: boolean;
 }
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
@@ -25,7 +29,19 @@ const roundTo = (value: number, decimals: number) => {
  * −/+ 스테퍼와 직접 입력을 함께 제공하는 숫자 입력.
  * 입력 중에는 자유롭게 타이핑하고, 포커스를 잃을 때 범위로 보정해 확정한다.
  */
-export function NumberField({ label, value, onChange, min, max, step, decimals = 0, unit, error }: NumberFieldProps) {
+export function NumberField({
+  label,
+  accessibilityLabel = label,
+  value,
+  onChange,
+  min,
+  max,
+  step,
+  decimals = 0,
+  unit,
+  error,
+  showSteppers = true,
+}: NumberFieldProps) {
   const theme = useTheme();
   const [text, setText] = useState(String(value));
   const [syncedValue, setSyncedValue] = useState(value);
@@ -56,7 +72,7 @@ export function NumberField({ label, value, onChange, min, max, step, decimals =
     return (
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`${label} ${direction < 0 ? '감소' : '증가'}`}
+        accessibilityLabel={`${accessibilityLabel} ${direction < 0 ? '감소' : '증가'}`}
         accessibilityState={{ disabled }}
         disabled={disabled}
         hitSlop={6}
@@ -78,9 +94,9 @@ export function NumberField({ label, value, onChange, min, max, step, decimals =
           {label}
         </Text>
         <View style={styles.controls}>
-          {stepper(-1)}
+          {showSteppers ? stepper(-1) : null}
           <TextInput
-            accessibilityLabel={label}
+            accessibilityLabel={accessibilityLabel}
             value={text}
             onChangeText={setText}
             onEndEditing={commitText}
@@ -93,7 +109,7 @@ export function NumberField({ label, value, onChange, min, max, step, decimals =
               { color: theme.text, borderColor: error ? theme.danger : theme.border, backgroundColor: theme.background },
             ]}
           />
-          {stepper(1)}
+          {showSteppers ? stepper(1) : null}
           {unit ? <Text style={[styles.unit, { color: theme.textMuted }]}>{unit}</Text> : null}
         </View>
       </View>
