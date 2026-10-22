@@ -9,6 +9,17 @@ The Factory Production Line Simulator is a comprehensive tool designed to replic
 - Simulation of production workflow with real-time analytics.
 - Troubleshooting and reporting tools to identify bottlenecks.
 
+## iPhone App
+
+An Expo (React Native + TypeScript) iPhone app lives in [`mobile/`](mobile/README.md).
+Run it on your iPhone with Expo Go — no Mac required:
+
+```bash
+cd mobile
+npm install
+npm start   # scan the QR code with the iPhone camera
+```
+
 ## Installation
 To install the Factory Production Line Simulator, follow these steps:
 
